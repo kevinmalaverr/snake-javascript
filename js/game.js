@@ -17,6 +17,7 @@ class Game {
   head;
   tail;
   gameContext;
+  time;
 
   constructor() {
     this.canvas = document.getElementById("game");
@@ -93,12 +94,27 @@ class Game {
     });
   };
 
-  gameOver() {}
+  gameOver() {
+    clearInterval(this.time);
+    alert("game over");
+  }
+
+  calcColitions() {
+    const colition =
+      this.head.x === 0 ||
+      this.head.x === 39 ||
+      this.head.y === 0 ||
+      this.head.y === 39;
+    if (colition) {
+      this.gameOver();
+    }
+  }
 
   init() {
     this.controlator();
-    setInterval(() => {
+    this.time = setInterval(() => {
       this.increaseDirection();
+      this.calcColitions();
       this.drawSnake();
     }, 1000);
   }
