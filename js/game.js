@@ -1,9 +1,9 @@
-class snakeNode {
+class SnakeNode {
   next;
   x;
   y;
 
-  constructor(next, x, y) {
+  constructor(x, y, next = null) {
     this.next = next;
     this.x = x;
     this.y = y;
@@ -11,62 +11,63 @@ class snakeNode {
 }
 
 class Game {
-  matriz;
-  snakeLength = 5;
+  snakeLength = 4;
   canvasSize = 40;
   direction = "right";
-  head = { x, y };
-  tail = { x, y };
+  head;
+  tail;
   gameContext;
-  snake;
 
   constructor() {
     this.canvas = document.getElementById("game");
     this.gameContext = this.canvas.getContext("2d");
-    let arr = [];
-    for (let i = 0; i < this.canvasSize; i++) {
-      arr[i] = [false];
-    }
-    this.matriz = arr;
+    this.tail = new SnakeNode(16, 20);
+    this.head = this.tail;
+
     for (let i = 0; i < this.snakeLength; i++) {
-      this.matriz[this.coordX - i][this.coordY] = true;
+      let nHead = new SnakeNode(this.head.x + 1, this.head.y);
+      this.head.next = nHead;
+      this.head = nHead;
     }
-    console.log(this.matriz);
   }
 
-  snakeNode = {};
-
   increaseDirection() {
+    let newHead;
     switch (this.direction) {
       case "up":
-        this.coordY--;
+        newHead = new SnakeNode(this.head.x, this.head.y - 1);
         break;
       case "down":
-        this.coordY++;
+        newHead = new SnakeNode(this.head.x, this.head.y + 1);
         break;
       case "left":
-        this.coordX--;
+        newHead = new SnakeNode(this.head.x - 1, this.head.y);
         break;
       case "right":
-        this.coordX++;
+        newHead = new SnakeNode(this.head.x + 1, this.head.y);
         break;
       default:
         break;
     }
+    this.tail = this.tail.next;
+    this.head.next = newHead;
+    this.head = newHead;
   }
 
   drawSnake() {
     this.gameContext.fillStyle = "green";
-    this.matriz[this.tailX][this.tailY] = false;
-    this.matriz[this.coordX][this.coordY] = true;
-
     this.gameContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    for (let i = 0; i < this.matriz.length; i++) {
-      for (let j = 0; j < this.matriz[i].length; j++) {
-        if (this.matriz[i][j]) {
-          this.gameContext.fillRect(i * 10, j * 10, 10, 10);
-        }
-      }
+
+    this.gameContext.fillRect(0, 0, 10, 400);
+    this.gameContext.fillRect(390, 0, 10, 400);
+    this.gameContext.fillRect(0, 0, 400, 10);
+    this.gameContext.fillRect(0, 390, 400, 10);
+
+    this.gameContext.fillRect(this.tail.x * 10, this.tail.y * 10, 10, 10);
+    let next = this.tail.next;
+    while (next) {
+      this.gameContext.fillRect(next.x * 10, next.y * 10, 10, 10);
+      next = next.next;
     }
   }
 
@@ -91,6 +92,8 @@ class Game {
       }
     });
   };
+
+  gameOver() {}
 
   init() {
     this.controlator();
