@@ -19,6 +19,7 @@ class Game {
   gameContext;
   time;
   food;
+  increase = false;
 
   constructor() {
     this.canvas = document.getElementById("game");
@@ -52,7 +53,12 @@ class Game {
       default:
         break;
     }
-    this.tail = this.tail.next;
+
+    if (!this.increase) {
+      this.tail = this.tail.next;
+    }
+    this.increase = false;
+
     this.head.next = newHead;
     this.head = newHead;
   }
@@ -60,15 +66,17 @@ class Game {
   drawSnake() {
     this.gameContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.gameContext.fillStyle = "red";
+    this.gameContext.fillStyle = "#c0392b";
     this.gameContext.fillRect(this.food.x * 10, this.food.y * 10, 10, 10);
 
-    this.gameContext.fillStyle = "green";
+    this.gameContext.fillStyle = "#34495e";
 
     this.gameContext.fillRect(0, 0, 10, 400);
     this.gameContext.fillRect(390, 0, 10, 400);
     this.gameContext.fillRect(0, 0, 400, 10);
     this.gameContext.fillRect(0, 390, 400, 10);
+
+    this.gameContext.fillStyle = "#27ae60";
 
     this.gameContext.fillRect(this.tail.x * 10, this.tail.y * 10, 10, 10);
     let next = this.tail.next;
@@ -136,7 +144,9 @@ class Game {
     const eaten = this.head.x === this.food.x && this.head.y === this.food.y;
     if (eaten) {
       this.snakeLength++;
+      this.increase = true;
       this.generateFood();
+      document.getElementById("score").innerText = this.snakeLength;
     }
   }
 
@@ -151,9 +161,12 @@ class Game {
       this.increaseDirection();
       this.calcColitions();
       this.drawSnake();
-    }, 300);
+    }, 100);
   }
 }
 
 const game = new Game();
-game.init();
+
+document.getElementById("start-button").addEventListener("click", () => {
+  game.init();
+});
